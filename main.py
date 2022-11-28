@@ -1,5 +1,4 @@
-import asyncio
-
+"""Webservice for ОТКРЫТЫЙ КОД test task"""
 import uvicorn
 
 from elasticsearch import AsyncElasticsearch
@@ -15,6 +14,7 @@ class SearchMatch:
     def __new__(cls, es_raw_data: dict):
         if es_raw_data['hits']["hits"]:
             return super(SearchMatch, cls).__new__(cls)
+        return None
 
     def __init__(self, es_raw_data: dict):
         self.index = es_raw_data['hits']['hits'][0]['_index']
@@ -23,6 +23,7 @@ class SearchMatch:
         self.body = es_raw_data['hits']['hits'][0]['_source']['body']
 
     def parse_match(self):
+        """returns json, based on object data"""
         return {
             'title': self.title,
             'body': self.body
@@ -33,8 +34,9 @@ class SearchMatch:
 
 
 async def get_matches(request: str):
+    """Returns sorted list of all matches in elasticsearch"""
     all_indexes: dict = await es.indices.get_alias()
-    list_of_matches = list()
+    list_of_matches = []
     for index in all_indexes.keys():
         es_response = await es.search(index=index, size=1, query={"match": {"body": request}})
         match_obj = SearchMatch(es_response)
@@ -45,7 +47,8 @@ async def get_matches(request: str):
 
 @app.get('/search')
 async def search(request: str):
-    result = dict()
+    """GET method return JSON of founded documents in elasticsearch"""
+    result = {}
     for match in await get_matches(request):
         result[match.index] = match.parse_match()
     return result

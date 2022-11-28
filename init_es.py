@@ -3,6 +3,7 @@ from elasticsearch import AsyncElasticsearch
 
 es = AsyncElasticsearch("http://localhost:9200")
 
+
 async def init_es():
     es_data = await es.search(query={"match_all": {}})
     if es_data['hits']['hits']:
