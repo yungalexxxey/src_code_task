@@ -33,7 +33,7 @@ class SearchMatch:
 
 
 async def get_matches(request: str):
-    all_indexes: dict  = await es.indices.get_alias()
+    all_indexes: dict = await es.indices.get_alias()
     list_of_matches = list()
     for index in all_indexes.keys():
         es_response = await es.search(index=index, size=1, query={"match": {"body": request}})
@@ -43,7 +43,7 @@ async def get_matches(request: str):
     return sorted(list_of_matches, key=lambda x: x.score, reverse=True)
 
 
-@app.get('/')
+@app.get('/search')
 async def search(request: str):
     result = dict()
     for match in await get_matches(request):
