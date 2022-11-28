@@ -35,7 +35,7 @@ curl -X 'GET' \
 curl -X 'GET' \
   -G 'http://localhost:1337/search' \
   -H 'accept: application/json; charset= utf-8' \
---data-urlencode "request=шины" 
+--data-urlencode "request=кухня" 
 ```
 
 EXAMPLE OF RESPONSE:
