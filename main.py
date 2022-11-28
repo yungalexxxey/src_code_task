@@ -47,7 +47,8 @@ async def get_matches(request: str):
 
 @app.get('/search')
 async def search(request: str):
-    """GET method return JSON of founded documents in elasticsearch"""
+    """GET method returns JSON of founded documents in elasticsearch"""
+
     result = {}
     for match in await get_matches(request):
         result[match.index] = match.parse_match()
