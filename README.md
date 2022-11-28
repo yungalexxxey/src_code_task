@@ -37,3 +37,14 @@ curl -X 'GET' \
   -H 'accept: application/json; charset= utf-8' \
 --data-urlencode "request=шины" 
 ```
+
+EXAMPLE OF RESPONSE:
+
+```
+{
+  "новости": {
+    "title": "добрый автобус",
+    "body": "Какая-то небольшая новость про добрый автобус"
+  }
+}
+```
