@@ -45,6 +45,11 @@ async def get_matches(request: str):
     return sorted(list_of_matches, key=lambda x: x.score, reverse=True)
 
 
+@app.on_event('shutdown')
+async def shutdown():
+    await es.close()
+
+
 @app.get('/search')
 async def search(request: str):
     """GET method returns JSON of founded documents in elasticsearch"""
