@@ -47,6 +47,7 @@ async def get_matches(request: str):
 
 @app.on_event('shutdown')
 async def shutdown():
+    """elasticsearch connection will be closed"""
     await es.close()
 
 
