@@ -3,9 +3,26 @@ import uvicorn
 
 from elasticsearch import AsyncElasticsearch
 from fastapi import FastAPI
+from fuzzywuzzy import process
 
 es = AsyncElasticsearch("http://localhost:9200")
 app = FastAPI()
+
+index_themes = {
+    'новости': ["деревья на Садовом кольце", "добрый автобус", "выставка IT-технологий"],
+    "кухня": ["рецепт борща", "яблочный пирог", "тайская кухня"],
+    'товары': ["Дети капитана Гранта", "зимние шины", "Тайская кухня"]
+}
+
+
+def find_possible_indexes(request: str) -> list:
+    """Finds all possible indexes"""
+    possible_indexes = []
+    for theme, value in index_themes.items():
+        for match in process.extract(request, value):
+            if match[1] > 65:
+                possible_indexes.append(theme)
+    return possible_indexes
 
 
 class SearchMatch:
@@ -22,7 +39,7 @@ class SearchMatch:
         self.title = es_raw_data['hits']['hits'][0]['_source']['title']
         self.body = es_raw_data['hits']['hits'][0]['_source']['body']
 
-    def parse_match(self):
+    def parse_match(self) -> dict:
         """returns json, based on object data"""
         return {
             'title': self.title,
@@ -33,11 +50,10 @@ class SearchMatch:
         return f"{self.index} - {self.title} - {self.body} - {self.score}"
 
 
-async def get_matches(request: str):
+async def get_matches(request: str) -> list:
     """Returns sorted list of all matches in elasticsearch"""
-    all_indexes: dict = await es.indices.get_alias()
     list_of_matches = []
-    for index in all_indexes.keys():
+    for index in find_possible_indexes(request):
         es_response = await es.search(index=index, size=1, query={"match": {"body": request}})
         match_obj = SearchMatch(es_response)
         if match_obj:
